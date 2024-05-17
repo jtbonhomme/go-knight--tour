@@ -13,26 +13,15 @@ const (
 	Complete
 )
 
-const (
-	North = iota
-	East
-	South
-	West
-)
-
-const (
-	Left = iota
-	Right
-)
-
 type Position struct {
 	X int
 	Y int
 }
 
 type Move struct {
-	Direction int
-	Turn      int
+	X         int
+	Y         int
+	Direction string
 }
 
 type Knight struct {
@@ -50,20 +39,37 @@ func New(speed int) *Knight {
 	}
 }
 
-func (k *Knight) Moves() []Move {
+func Moves() []Move {
 	moves := []Move{}
 
-	for d := 0; d < 4; d++ {
-		for t := 0; t < 2; t++ {
-			moves = append(moves, Move{d, t})
-		}
-	}
+	moves = append(moves, Move{-1, -2, "north left"},
+		Move{1, -2, "north right"},
+		Move{-1, 2, "south left"},
+		Move{1, 2, "south right"},
+		Move{2, -1, "east left"},
+		Move{2, 1, "east right"},
+		Move{-2, 1, "west left"},
+		Move{-2, -1, "west right"})
 
 	return moves
 }
 
+func RandomMoves() []Move {
+	m := Moves()
+	rand.Shuffle(len(m), func(i, j int) { m[i], m[j] = m[j], m[i] })
+	return m
+}
+
 func (k *Knight) Tour() int {
 	return k.tour
+}
+
+func (k *Knight) OutOfRange(p Position) bool {
+	if p.X >= 8 || p.X < 0 || p.Y >= 8 || p.Y < 0 {
+		return true
+	}
+
+	return false
 }
 
 func (k *Knight) PositionExists(p Position) bool {
@@ -87,17 +93,21 @@ func (k *Knight) Solve() bool {
 		return false
 	}
 
-	for {
-		// pick randow move
-		p = Position{rand.Intn(8), rand.Intn(8)}
-		if !k.PositionExists(p) {
-			break
+	moves := RandomMoves()
+	// pick successively random moves
+	for _, m := range moves {
+		p = k.Positions[len(k.Positions)-1]
+		p.X += m.X
+		p.Y += m.Y
+		if !k.PositionExists(p) && !k.OutOfRange(p) {
+
+			k.Positions = append(k.Positions, p)
+			return k.Solve()
 		}
 	}
 
-	k.Positions = append(k.Positions, p)
-
-	return k.Solve()
+	log.Println("no solution")
+	return false
 }
 
 func (k *Knight) Complete() {

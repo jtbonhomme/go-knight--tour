@@ -54,7 +54,7 @@ func (g *Game) drawKnightPosition(screen *ebiten.Image, p knight.Position) {
 	// draw circle
 	vector.StrokeCircle(screen,
 		xp, yp, radius,
-		strokeWidth, color.RGBA{0x8b, 0x8d, 0x80, 0xff}, false)
+		strokeWidth, color.RGBA{0xaa, 0xaa, 0xaa, 0xff}, false)
 }
 
 func (g *Game) drawKnightMove(screen *ebiten.Image, l, p knight.Position) {
@@ -68,7 +68,7 @@ func (g *Game) drawKnightMove(screen *ebiten.Image, l, p knight.Position) {
 	// draw line between position
 	vector.StrokeLine(screen,
 		xp, yp, xl, yl,
-		strokeWidth, color.RGBA{0x8b, 0x8d, 0x80, 0xff}, false)
+		strokeWidth, color.RGBA{0xff, 0xff, 0xff, 0xff}, false)
 }
 
 func (g *Game) drawFrame(screen *ebiten.Image) {
