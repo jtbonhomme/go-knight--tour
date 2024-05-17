@@ -5,6 +5,7 @@ import (
 
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/vector"
+	"github.com/jtbonhomme/go-knight-tour/internal/knight"
 )
 
 const (
@@ -21,6 +22,53 @@ func (g *Game) Draw(screen *ebiten.Image) {
 	screen.Fill(g.BackgroundColor)
 
 	g.drawFrame(screen)
+	g.drawKnight(screen)
+}
+
+func (g *Game) drawKnight(screen *ebiten.Image) {
+	lastPosition := knight.Position{X: -1, Y: -1}
+
+	for _, p := range g.Knight.Positions {
+		g.drawKnightPosition(screen, p)
+		if lastPosition.X != -1 && lastPosition.Y != -1 {
+			g.drawKnightMove(screen, lastPosition, p)
+		}
+		lastPosition = p
+	}
+}
+
+func getCoordinatesFromPosition(p knight.Position) (float32, float32) {
+	var x, y float32
+	x = BoardX + float32(p.X)*BoardCellSize + BoardCellSize/2
+	y = BoardY + float32(p.Y)*BoardCellSize + BoardCellSize/2
+	return x, y
+}
+
+func (g *Game) drawKnightPosition(screen *ebiten.Image, p knight.Position) {
+	var xp, yp, strokeWidth, radius float32
+	strokeWidth = 1
+	radius = 5
+
+	// get current float coordinates of knight
+	xp, yp = getCoordinatesFromPosition(p)
+	// draw circle
+	vector.StrokeCircle(screen,
+		xp, yp, radius,
+		strokeWidth, color.RGBA{0x8b, 0x8d, 0x80, 0xff}, false)
+}
+
+func (g *Game) drawKnightMove(screen *ebiten.Image, l, p knight.Position) {
+	var xp, yp, strokeWidth, xl, yl float32
+	strokeWidth = 1
+
+	// get last float coordinates of knight
+	xl, yl = getCoordinatesFromPosition(l)
+	// get current float coordinates of knight
+	xp, yp = getCoordinatesFromPosition(p)
+	// draw line between position
+	vector.StrokeLine(screen,
+		xp, yp, xl, yl,
+		strokeWidth, color.RGBA{0x8b, 0x8d, 0x80, 0xff}, false)
 }
 
 func (g *Game) drawFrame(screen *ebiten.Image) {

@@ -3,7 +3,16 @@ package game
 import (
 	"image/color"
 
+	"github.com/jtbonhomme/go-knight-tour/internal/knight"
+
 	"github.com/hajimehoshi/ebiten/v2"
+)
+
+const (
+	Started = iota
+	Running
+	Paused
+	Complete
 )
 
 // Game manages all internal game mechanisms.
@@ -11,6 +20,8 @@ type Game struct {
 	ScreenWidth     int
 	ScreenHeight    int
 	BackgroundColor color.Color
+	Knight          *knight.Knight
+	state           int
 }
 
 // New creates a new game object.
@@ -19,6 +30,8 @@ func New() *Game {
 		ScreenWidth:     500,
 		ScreenHeight:    500,
 		BackgroundColor: color.RGBA{0x0b, 0x0d, 0x00, 0xff},
+		Knight:          knight.New(500),
+		state:           Started,
 	}
 
 	return g

@@ -5,6 +5,7 @@ import (
 	"log"
 
 	"github.com/hajimehoshi/ebiten/v2"
+	"github.com/hajimehoshi/ebiten/v2/inpututil"
 )
 
 var ErrQuit = errors.New("QUIT")
@@ -17,5 +18,21 @@ func (g *Game) Update() error {
 		return ErrQuit
 	}
 
+	if inpututil.IsKeyJustPressed(ebiten.KeySpace) {
+		switch g.state {
+		case Started:
+			g.state = Running
+			g.Knight.Run()
+			log.Printf("game: run")
+		case Running:
+			g.state = Paused
+			g.Knight.Pause()
+			log.Printf("game: pause")
+		case Paused:
+			g.state = Running
+			g.Knight.Run()
+			log.Printf("game: run")
+		}
+	}
 	return nil
 }
