@@ -6,13 +6,6 @@ import (
 	"time"
 )
 
-const (
-	Started = iota
-	Running
-	Paused
-	Complete
-)
-
 type Position struct {
 	X int
 	Y int
@@ -25,17 +18,17 @@ type Move struct {
 }
 
 type Knight struct {
-	Positions []Position
-	state     int
-	speed     int
-	tour      int
+	Positions      []Position
+	speed          int
+	tour           int
+	implementation string
 }
 
-func New(speed int) *Knight {
+func New(speed int, implementation string) *Knight {
 	return &Knight{
-		state:     Started,
-		Positions: []Position{},
-		speed:     speed,
+		Positions:      []Position{},
+		speed:          speed,
+		implementation: implementation,
 	}
 }
 
@@ -64,7 +57,7 @@ func (k *Knight) Tour() int {
 	return k.tour
 }
 
-func (k *Knight) OutOfRange(p Position) bool {
+func OutOfRange(p Position) bool {
 	if p.X >= 8 || p.X < 0 || p.Y >= 8 || p.Y < 0 {
 		return true
 	}
@@ -72,8 +65,8 @@ func (k *Knight) OutOfRange(p Position) bool {
 	return false
 }
 
-func (k *Knight) PositionExists(p Position) bool {
-	for _, kp := range k.Positions {
+func PositionExists(p Position, positions []Position) bool {
+	for _, kp := range positions {
 		if p.X == kp.X && p.Y == kp.Y {
 			return true
 		}
@@ -82,27 +75,24 @@ func (k *Knight) PositionExists(p Position) bool {
 	return false
 }
 
-func (k *Knight) Solve() bool {
-	var p Position
-
+func (k *Knight) NaiveSolver(tour int, positions []Position) bool {
 	time.Sleep(time.Millisecond * time.Duration(k.speed))
-	k.tour++
 
-	log.Printf("knight's tour: %d", k.tour)
-	if k.tour == 8*8 {
-		return false
+	if tour == 8*8 {
+		log.Println("win!")
+		return true
 	}
 
 	moves := RandomMoves()
 	// pick successively random moves
 	for _, m := range moves {
-		p = k.Positions[len(k.Positions)-1]
+		p := positions[len(positions)-1]
 		p.X += m.X
 		p.Y += m.Y
-		if !k.PositionExists(p) && !k.OutOfRange(p) {
-
-			k.Positions = append(k.Positions, p)
-			return k.Solve()
+		if !PositionExists(p, positions) && !OutOfRange(p) {
+			positions = append(positions, p)
+			k.Update(positions, tour)
+			return k.NaiveSolver(tour+1, positions)
 		}
 	}
 
@@ -110,42 +100,55 @@ func (k *Knight) Solve() bool {
 	return false
 }
 
-func (k *Knight) Complete() {
-	if k.state != Running && k.state != Paused {
-		return
+func (k *Knight) Update(positions []Position, tour int) {
+	k.Positions = positions
+	k.tour = tour
+}
+
+func (k *Knight) BacktrackingSolver(tour int, positions []Position) bool {
+	time.Sleep(time.Millisecond * time.Duration(k.speed))
+
+	if tour == 8*8 {
+		log.Println("win!")
+		return true
 	}
 
-	k.state = Complete
+	moves := RandomMoves()
+	// pick successively random moves
+	for _, m := range moves {
+		p := positions[len(positions)-1]
+		p.X += m.X
+		p.Y += m.Y
+		if !PositionExists(p, positions) && !OutOfRange(p) {
+			positions = append(positions, p)
+			k.Update(positions, tour)
+			return k.NaiveSolver(tour+1, positions)
+		}
+	}
+
+	log.Println("no solution")
+	return false
 }
 
 func (k *Knight) Run() {
-	if k.state != Started && k.state != Paused {
-		return
-	}
-
+	var result bool
 	// pick initial position
-	if len(k.Positions) == 0 {
-		x := rand.Intn(8)
-		y := rand.Intn(8)
-		k.Positions = append(k.Positions, Position{x, y})
-	}
+	x := rand.Intn(8)
+	y := rand.Intn(8)
+	k.Positions = append(k.Positions, Position{x, y})
 
 	go func() {
 		log.Println("start knight's tour solver")
-		k.Solve()
+		switch k.implementation {
+		case "naive":
+			result = k.NaiveSolver(1, k.Positions)
+		case "backtracking":
+			result = k.BacktrackingSolver(1, k.Positions)
+		default:
+			log.Fatalf("%s implementation does not exist", k.implementation)
+		}
+		log.Printf("solver result: %v", result)
 	}()
 
-	k.state = Running
 	log.Printf("knight: run")
-
-}
-
-func (k *Knight) Pause() {
-	if k.state != Running {
-		return
-	}
-
-	k.state = Paused
-	log.Printf("knight: pause")
-
 }

@@ -25,12 +25,12 @@ type Game struct {
 }
 
 // New creates a new game object.
-func New(speed int) *Game {
+func New(speed int, implementation string) *Game {
 	g := &Game{
 		ScreenWidth:     500,
 		ScreenHeight:    500,
 		BackgroundColor: color.RGBA{0x0b, 0x0d, 0x00, 0xff},
-		Knight:          knight.New(speed),
+		Knight:          knight.New(speed, implementation),
 		state:           Started,
 	}
 

@@ -1,11 +1,14 @@
 package game
 
 import (
+	"fmt"
 	"image/color"
 
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/vector"
+	"github.com/jtbonhomme/go-knight-tour/internal/fonts"
 	"github.com/jtbonhomme/go-knight-tour/internal/knight"
+	"github.com/jtbonhomme/go-knight-tour/internal/text"
 )
 
 const (
@@ -23,6 +26,17 @@ func (g *Game) Draw(screen *ebiten.Image) {
 
 	g.drawFrame(screen)
 	g.drawKnight(screen)
+	g.drawDebug(screen)
+}
+
+func (g *Game) drawDebug(screen *ebiten.Image) {
+	text.DrawTextAtPos(
+		screen, fonts.SmallFont,
+		50,
+		480,
+		fmt.Sprintf("tour: %d", g.Knight.Tour()),
+		color.RGBA{R: 0x00, G: 0xff, B: 0xff, A: 0xff},
+	)
 }
 
 func (g *Game) drawKnight(screen *ebiten.Image) {
