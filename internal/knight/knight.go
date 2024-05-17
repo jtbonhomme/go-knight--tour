@@ -166,9 +166,7 @@ func (k *Knight) OptimizedSolver(tour int, positions []Position) bool {
 	for _, p := range rankedPositions {
 		if !PositionIsVisited(p, positions) && !OutOfRange(p) {
 			positions = append(positions, p)
-			if currentPosition.Distance(p) != 3 {
-				log.Println("DISTANCE ERROR")
-			}
+			Invalidate(p)
 			k.Positions = positions
 			if k.OptimizedSolver(tour+1, positions) {
 				return true
@@ -219,17 +217,41 @@ func (p Position) Distance(q Position) int {
 	return dx + dy
 }
 
-func (p Position) Accessible() int {
-	var accessible = [8 * 8]int{
-		2, 3, 4, 4, 4, 4, 3, 2,
-		3, 4, 6, 6, 6, 6, 4, 3,
-		4, 6, 8, 8, 8, 8, 6, 4,
-		4, 6, 8, 8, 8, 8, 6, 4,
-		4, 6, 8, 8, 8, 8, 6, 4,
-		4, 6, 8, 8, 8, 8, 6, 4,
-		3, 4, 6, 6, 6, 6, 4, 3,
-		2, 3, 4, 4, 4, 4, 3, 2}
+var accessible = [8 * 8]int{
+	2, 3, 4, 4, 4, 4, 3, 2,
+	3, 4, 6, 6, 6, 6, 4, 3,
+	4, 6, 8, 8, 8, 8, 6, 4,
+	4, 6, 8, 8, 8, 8, 6, 4,
+	4, 6, 8, 8, 8, 8, 6, 4,
+	4, 6, 8, 8, 8, 8, 6, 4,
+	3, 4, 6, 6, 6, 6, 4, 3,
+	2, 3, 4, 4, 4, 4, 3, 2}
 
+func Invalidate(pos Position) {
+	var p Position
+
+	if OutOfRange(pos) {
+		return
+	}
+
+	moves := Moves()
+	for _, m := range moves {
+		p.X = pos.X + m.X
+		p.Y = pos.Y + m.Y
+
+		if OutOfRange(p) {
+			continue
+		}
+
+		if accessible[p.X+p.Y*8] != 0 {
+			accessible[p.X+p.Y*8]--
+		}
+	}
+
+	accessible[pos.X+pos.Y*8] = 0
+}
+
+func (p Position) Accessible() int {
 	if p.X < 0 || p.Y < 0 || p.X >= 8 || p.Y >= 8 {
 		return -1
 	}
