@@ -1,6 +1,7 @@
 package main
 
 import (
+	"flag"
 	"log"
 
 	"github.com/jtbonhomme/go-knight-tour/internal/game"
@@ -8,7 +9,12 @@ import (
 
 func main() {
 	var err error
-	g := game.New()
+	var speed int
+
+	flag.IntVar(&speed, "s", 1, "speed resolution (default is 1)")
+	flag.Parse()
+
+	g := game.New(speed)
 
 	log.Println("Start game")
 	err = g.Run()
