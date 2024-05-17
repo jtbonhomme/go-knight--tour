@@ -21,9 +21,19 @@ go run cmd/knight/main.go -s 20 -i naive
 ### Backtracking
 
 * Random move: no strategy for moves,
-* Backtracking: examin each possible move and go back in history to try another branch if reaches a blocking situation
+* Backtracking: examin each move and go back in history to try another branch if reaches a blocking situation
 * No solution: never ending processing
 
 ```sh
 go run cmd/knight/main.go -s 0 -i backtracking
+```
+
+### Optimized
+
+* Consider moving in prority toward the cells with minimal access,
+* Backtracking: examin each move and go back in history to try another branch if reaches a blocking situation
+* Find a solution for some starting points (4,6) or (2,3), but infinite loop for other points
+
+```sh
+go run cmd/knight/main.go -s 0 -i optimized
 ```
