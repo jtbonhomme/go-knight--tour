@@ -66,7 +66,7 @@ func OutOfRange(p Position) bool {
 	return false
 }
 
-func PositionExists(p Position, positions []Position) bool {
+func PositionIsVisited(p Position, positions []Position) bool {
 	for _, kp := range positions {
 		if p.X == kp.X && p.Y == kp.Y {
 			return true
@@ -90,7 +90,7 @@ func (k *Knight) NaiveSolver(tour int, positions []Position) bool {
 		p := positions[len(positions)-1]
 		p.X += m.X
 		p.Y += m.Y
-		if !PositionExists(p, positions) && !OutOfRange(p) {
+		if !PositionIsVisited(p, positions) && !OutOfRange(p) {
 			positions = append(positions, p)
 			k.Update(positions, tour)
 			return k.NaiveSolver(tour+1, positions)
@@ -119,7 +119,7 @@ func (k *Knight) BacktrackingSolver(tour int, positions []Position) bool {
 		p := positions[len(positions)-1]
 		p.X += m.X
 		p.Y += m.Y
-		if !PositionExists(p, positions) && !OutOfRange(p) {
+		if !PositionIsVisited(p, positions) && !OutOfRange(p) {
 			positions = append(positions, p)
 			k.Update(positions, tour)
 			if k.BacktrackingSolver(tour+1, positions) {
@@ -137,14 +137,14 @@ func (a ByAccessible) Len() int           { return len(a) }
 func (a ByAccessible) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
 func (a ByAccessible) Less(i, j int) bool { return a[i].Accessible() < a[j].Accessible() }
 
-func RankedPositions(pos Position) []Position {
+func RankedPositions(pos Position, history []Position) []Position {
 	positions := []Position{}
 	moves := Moves()
 	for _, m := range moves {
 		p := pos
 		p.X += m.X
 		p.Y += m.Y
-		if !PositionExists(p, positions) && !OutOfRange(p) {
+		if !PositionIsVisited(p, history) && !OutOfRange(p) {
 			positions = append(positions, p)
 		}
 	}
@@ -161,11 +161,14 @@ func (k *Knight) OptimizedSolver(tour int, positions []Position) bool {
 	}
 
 	currentPosition := positions[len(positions)-1]
-	rankedPositions := RankedPositions(currentPosition)
+	rankedPositions := RankedPositions(currentPosition, positions)
 	// pick best moves
 	for _, p := range rankedPositions {
-		if !PositionExists(p, positions) && !OutOfRange(p) {
+		if !PositionIsVisited(p, positions) && !OutOfRange(p) {
 			positions = append(positions, p)
+			if currentPosition.Distance(p) != 3 {
+				log.Println("DISTANCE ERROR")
+			}
 			k.Positions = positions
 			if k.OptimizedSolver(tour+1, positions) {
 				return true
@@ -202,6 +205,18 @@ func (k *Knight) Run() {
 	}()
 
 	log.Printf("knight: run")
+}
+
+func (p Position) Distance(q Position) int {
+	dx := q.X - p.X
+	dy := q.Y - p.Y
+	if dx < 0 {
+		dx = -dx
+	}
+	if dy < 0 {
+		dy = -dy
+	}
+	return dx + dy
 }
 
 func (p Position) Accessible() int {
