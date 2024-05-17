@@ -11,7 +11,7 @@ Golang simulation of [knight's tour](https://en.wikipedia.org/wiki/Knight%27s_to
 ### First naive implementation
 
 * Random move: no strategy for moves,
-* Implementation: simple recursive implementarion
+* Implementation: simple recursive implementation
 * Result: reaches blocking situation before solving the problem
 
 ```sh
@@ -21,9 +21,9 @@ go run cmd/knight/main.go -s 20 -i naive
 ### Backtracking
 
 * Random move: no strategy for moves,
-* Backtracking: examin each possible branch of any possible move
-* No solution: reaches blocking situation before solving the problem
+* Backtracking: examin each possible move and go back in history to try another branch if reaches a blocking situation
+* No solution: never ending processing
 
 ```sh
-go run cmd/knight/main.go -s 20 -i backtracking
+go run cmd/knight/main.go -s 0 -i backtracking
 ```

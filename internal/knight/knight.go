@@ -96,7 +96,6 @@ func (k *Knight) NaiveSolver(tour int, positions []Position) bool {
 		}
 	}
 
-	log.Println("no solution")
 	return false
 }
 
@@ -122,11 +121,12 @@ func (k *Knight) BacktrackingSolver(tour int, positions []Position) bool {
 		if !PositionExists(p, positions) && !OutOfRange(p) {
 			positions = append(positions, p)
 			k.Update(positions, tour)
-			return k.NaiveSolver(tour+1, positions)
+			if k.BacktrackingSolver(tour+1, positions) {
+				return true
+			}
 		}
 	}
 
-	log.Println("no solution")
 	return false
 }
 

@@ -3,6 +3,7 @@ package game
 import (
 	"errors"
 	"log"
+	"time"
 
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/inpututil"
@@ -22,6 +23,7 @@ func (g *Game) Update() error {
 		switch g.state {
 		case Started:
 			g.state = Running
+			g.start = time.Now()
 			g.Knight.Run()
 			log.Printf("game: run")
 		}

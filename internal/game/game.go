@@ -2,6 +2,7 @@ package game
 
 import (
 	"image/color"
+	"time"
 
 	"github.com/jtbonhomme/go-knight-tour/internal/knight"
 
@@ -22,6 +23,7 @@ type Game struct {
 	BackgroundColor color.Color
 	Knight          *knight.Knight
 	state           int
+	start           time.Time
 }
 
 // New creates a new game object.

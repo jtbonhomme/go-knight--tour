@@ -3,6 +3,7 @@ package game
 import (
 	"fmt"
 	"image/color"
+	"time"
 
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/vector"
@@ -30,11 +31,15 @@ func (g *Game) Draw(screen *ebiten.Image) {
 }
 
 func (g *Game) drawDebug(screen *ebiten.Image) {
+	if g.state != Running {
+		return
+	}
+
 	text.DrawTextAtPos(
 		screen, fonts.SmallFont,
 		50,
 		480,
-		fmt.Sprintf("tour: %d", g.Knight.Tour()),
+		fmt.Sprintf("tour: %02d     time: %d", g.Knight.Tour(), int(time.Since(g.start).Milliseconds()/1000)),
 		color.RGBA{R: 0x00, G: 0xff, B: 0xff, A: 0xff},
 	)
 }
