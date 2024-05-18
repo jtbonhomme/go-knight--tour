@@ -21,14 +21,16 @@ type Knight struct {
 	tour           int
 	implementation string
 	grid           [8 * 8]int
+	speedChange    chan int
 }
 
-func New(speed int, implementation string) *Knight {
+func New(speed int, implementation string, speedChange chan int) *Knight {
 	return &Knight{
 		Positions:      []Position{},
 		speed:          speed,
 		implementation: implementation,
 		grid:           accessibility,
+		speedChange:    speedChange,
 	}
 }
 

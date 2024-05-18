@@ -27,10 +27,30 @@ func (g *Game) Draw(screen *ebiten.Image) {
 	g.drawFrame(screen)
 	g.drawKnight(screen)
 	g.drawFinish(screen)
+	g.drawInfo(screen)
 	g.drawDebug(screen)
 }
 
 func (g *Game) drawDebug(screen *ebiten.Image) {
+
+	text.DrawTextAtPos(
+		screen, fonts.SmallFont,
+		50,
+		25,
+		fmt.Sprintf("Engine TPS: %.02f", ebiten.ActualTPS()),
+		color.RGBA{R: 0x00, G: 0xff, B: 0xff, A: 0xff},
+	)
+
+	text.DrawTextAtPos(
+		screen, fonts.SmallFont,
+		250,
+		25,
+		fmt.Sprintf("Game ticks: %d", g.ticks),
+		color.RGBA{R: 0x00, G: 0xff, B: 0xff, A: 0xff},
+	)
+}
+
+func (g *Game) drawInfo(screen *ebiten.Image) {
 	if g.state == Started {
 		text.DrawTextAtPos(
 			screen, fonts.SmallFont,
@@ -52,9 +72,31 @@ func (g *Game) drawDebug(screen *ebiten.Image) {
 
 	text.DrawTextAtPos(
 		screen, fonts.SmallFont,
+		310,
+		470,
+		"solver: "+g.implementation,
+		color.RGBA{R: 0x00, G: 0xff, B: 0xff, A: 0xff},
+	)
+
+	text.DrawTextAtPos(
+		screen, fonts.SmallFont,
 		50,
 		490,
-		fmt.Sprintf("tour: %02d     time: %s", g.Knight.Tour(), g.duration),
+		fmt.Sprintf("tour: %02d", g.Knight.Tour()),
+		color.RGBA{R: 0x00, G: 0xff, B: 0xff, A: 0xff},
+	)
+	text.DrawTextAtPos(
+		screen, fonts.SmallFont,
+		155,
+		490,
+		fmt.Sprintf("duration: %s", g.duration),
+		color.RGBA{R: 0x00, G: 0xff, B: 0xff, A: 0xff},
+	)
+	text.DrawTextAtPos(
+		screen, fonts.SmallFont,
+		370,
+		490,
+		fmt.Sprintf("speed: %03d", g.speed),
 		color.RGBA{R: 0x00, G: 0xff, B: 0xff, A: 0xff},
 	)
 }

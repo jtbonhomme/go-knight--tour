@@ -4,7 +4,19 @@ import (
 	"log"
 	"slices"
 	"time"
+
+	"github.com/hajimehoshi/ebiten/v2"
 )
+
+func (k *Knight) handleSpeed() {
+	select {
+	case s := <-k.speedChange:
+		log.Println("speed change")
+		k.speed = s
+	default:
+	}
+	time.Sleep(time.Millisecond * time.Duration(float64(1000*k.speed)/ebiten.ActualTPS()))
+}
 
 func (k *Knight) NaiveSolver(tour int, positions []Position, stopChannel chan struct{}) bool {
 	select {
@@ -13,14 +25,14 @@ func (k *Knight) NaiveSolver(tour int, positions []Position, stopChannel chan st
 
 		return false
 	default:
-		time.Sleep(time.Millisecond * time.Duration(k.speed))
+		k.handleSpeed()
 
+		k.tour = tour
 		if tour == 8*8 {
 			log.Println("win!")
 			return true
 		}
 
-		k.tour = tour
 		moves := RandomMoves()
 		// pick successively random moves
 		for _, m := range moves {
@@ -45,14 +57,15 @@ func (k *Knight) BacktrackingSolver(tour int, positions []Position, stopChannel 
 
 		return false
 	default:
-		time.Sleep(time.Millisecond * time.Duration(k.speed))
+		k.handleSpeed()
+
+		k.tour = tour
 		if tour == 8*8 {
 			log.Println("win!")
 
 			return true
 		}
 
-		k.tour = tour
 		moves := RandomMoves()
 		// pick successively random moves
 		for _, m := range moves {
@@ -79,7 +92,8 @@ func (k *Knight) OptimizedSolver(tour int, positions []Position, stopChannel cha
 
 		return false
 	default:
-		time.Sleep(time.Millisecond * time.Duration(k.speed))
+		k.handleSpeed()
+
 		k.tour = tour
 		if tour == 8*8 {
 			log.Println("win!")

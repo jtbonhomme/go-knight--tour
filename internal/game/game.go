@@ -33,6 +33,9 @@ type Game struct {
 	stopChannel       chan struct{}
 	speed             int
 	implementation    string
+	speedChange       chan int
+	ticks             uint64
+	rtTicks           uint64
 }
 
 // New creates a new game object.
@@ -44,6 +47,7 @@ func New(speed int, implementation string) *Game {
 		speed:           speed,
 		implementation:  implementation,
 		state:           Started,
+		speedChange:     make(chan int),
 	}
 
 	return g
@@ -66,8 +70,10 @@ func (g *Game) Restart() {
 	}
 	g.stopChannel = make(chan struct{})
 	g.state = Running
+	g.ticks = 0
+	g.rtTicks = 0
 	g.start = time.Now()
-	g.Knight = knight.New(g.speed, g.implementation)
+	g.Knight = knight.New(g.speed, g.implementation, g.speedChange)
 	g.runResult = g.Knight.Run(g.stopChannel)
 	log.Printf("game: run")
 }
