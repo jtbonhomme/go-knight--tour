@@ -3,26 +3,24 @@ package knight
 import (
 	"log"
 	"math/rand"
-	"sort"
-	"time"
 )
 
-type Position struct {
-	X int
-	Y int
-}
-
-type Move struct {
-	X         int
-	Y         int
-	Direction string
-}
+var accessibility = [8 * 8]int{
+	2, 3, 4, 4, 4, 4, 3, 2,
+	3, 4, 6, 6, 6, 6, 4, 3,
+	4, 6, 8, 8, 8, 8, 6, 4,
+	4, 6, 8, 8, 8, 8, 6, 4,
+	4, 6, 8, 8, 8, 8, 6, 4,
+	4, 6, 8, 8, 8, 8, 6, 4,
+	3, 4, 6, 6, 6, 6, 4, 3,
+	2, 3, 4, 4, 4, 4, 3, 2}
 
 type Knight struct {
 	Positions      []Position
 	speed          int
 	tour           int
 	implementation string
+	grid           [8 * 8]int
 }
 
 func New(speed int, implementation string) *Knight {
@@ -30,151 +28,17 @@ func New(speed int, implementation string) *Knight {
 		Positions:      []Position{},
 		speed:          speed,
 		implementation: implementation,
+		grid:           accessibility,
 	}
-}
-
-func Moves() []Move {
-	moves := []Move{}
-
-	moves = append(moves, Move{-1, -2, "north left"},
-		Move{1, -2, "north right"},
-		Move{-1, 2, "south left"},
-		Move{1, 2, "south right"},
-		Move{2, -1, "east left"},
-		Move{2, 1, "east right"},
-		Move{-2, 1, "west left"},
-		Move{-2, -1, "west right"})
-
-	return moves
-}
-
-func RandomMoves() []Move {
-	m := Moves()
-	rand.Shuffle(len(m), func(i, j int) { m[i], m[j] = m[j], m[i] })
-	return m
 }
 
 func (k *Knight) Tour() int {
 	return k.tour
 }
 
-func OutOfRange(p Position) bool {
-	if p.X >= 8 || p.X < 0 || p.Y >= 8 || p.Y < 0 {
-		return true
-	}
-
-	return false
-}
-
-func PositionIsVisited(p Position, positions []Position) bool {
-	for _, kp := range positions {
-		if p.X == kp.X && p.Y == kp.Y {
-			return true
-		}
-	}
-
-	return false
-}
-
-func (k *Knight) NaiveSolver(tour int, positions []Position) bool {
-	time.Sleep(time.Millisecond * time.Duration(k.speed))
-
-	if tour == 8*8 {
-		log.Println("win!")
-		return true
-	}
-
-	moves := RandomMoves()
-	// pick successively random moves
-	for _, m := range moves {
-		p := positions[len(positions)-1]
-		p.X += m.X
-		p.Y += m.Y
-		if !PositionIsVisited(p, positions) && !OutOfRange(p) {
-			positions = append(positions, p)
-			k.Update(positions, tour)
-			return k.NaiveSolver(tour+1, positions)
-		}
-	}
-
-	return false
-}
-
 func (k *Knight) Update(positions []Position, tour int) {
 	k.Positions = positions
 	k.tour = tour
-}
-
-func (k *Knight) BacktrackingSolver(tour int, positions []Position) bool {
-	time.Sleep(time.Millisecond * time.Duration(k.speed))
-
-	if tour == 8*8 {
-		log.Println("win!")
-		return true
-	}
-
-	moves := RandomMoves()
-	// pick successively random moves
-	for _, m := range moves {
-		p := positions[len(positions)-1]
-		p.X += m.X
-		p.Y += m.Y
-		if !PositionIsVisited(p, positions) && !OutOfRange(p) {
-			positions = append(positions, p)
-			k.Update(positions, tour)
-			if k.BacktrackingSolver(tour+1, positions) {
-				return true
-			}
-		}
-	}
-
-	return false
-}
-
-type ByAccessible []Position
-
-func (a ByAccessible) Len() int           { return len(a) }
-func (a ByAccessible) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
-func (a ByAccessible) Less(i, j int) bool { return a[i].Accessible() < a[j].Accessible() }
-
-func RankedPositions(pos Position, history []Position) []Position {
-	positions := []Position{}
-	moves := Moves()
-	for _, m := range moves {
-		p := pos
-		p.X += m.X
-		p.Y += m.Y
-		if !PositionIsVisited(p, history) && !OutOfRange(p) {
-			positions = append(positions, p)
-		}
-	}
-	sort.Sort(ByAccessible(positions))
-	return positions
-}
-
-func (k *Knight) OptimizedSolver(tour int, positions []Position) bool {
-	time.Sleep(time.Millisecond * time.Duration(k.speed))
-	k.tour = tour
-	if tour == 8*8 {
-		log.Println("win!")
-		return true
-	}
-
-	currentPosition := positions[len(positions)-1]
-	rankedPositions := RankedPositions(currentPosition, positions)
-	// pick best moves
-	for _, p := range rankedPositions {
-		if !PositionIsVisited(p, positions) && !OutOfRange(p) {
-			positions = append(positions, p)
-			Invalidate(p)
-			k.Positions = positions
-			if k.OptimizedSolver(tour+1, positions) {
-				return true
-			}
-		}
-	}
-
-	return false
 }
 
 func (k *Knight) Run() {
@@ -215,46 +79,4 @@ func (p Position) Distance(q Position) int {
 		dy = -dy
 	}
 	return dx + dy
-}
-
-var accessible = [8 * 8]int{
-	2, 3, 4, 4, 4, 4, 3, 2,
-	3, 4, 6, 6, 6, 6, 4, 3,
-	4, 6, 8, 8, 8, 8, 6, 4,
-	4, 6, 8, 8, 8, 8, 6, 4,
-	4, 6, 8, 8, 8, 8, 6, 4,
-	4, 6, 8, 8, 8, 8, 6, 4,
-	3, 4, 6, 6, 6, 6, 4, 3,
-	2, 3, 4, 4, 4, 4, 3, 2}
-
-func Invalidate(pos Position) {
-	var p Position
-
-	if OutOfRange(pos) {
-		return
-	}
-
-	moves := Moves()
-	for _, m := range moves {
-		p.X = pos.X + m.X
-		p.Y = pos.Y + m.Y
-
-		if OutOfRange(p) {
-			continue
-		}
-
-		if accessible[p.X+p.Y*8] != 0 {
-			accessible[p.X+p.Y*8]--
-		}
-	}
-
-	accessible[pos.X+pos.Y*8] = 0
-}
-
-func (p Position) Accessible() int {
-	if p.X < 0 || p.Y < 0 || p.X >= 8 || p.Y >= 8 {
-		return -1
-	}
-
-	return accessible[p.X+p.Y*8]
 }
