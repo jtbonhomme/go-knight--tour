@@ -3,7 +3,6 @@ package handdrawn
 import (
 	"image"
 	"image/color"
-	"log"
 	"math/rand"
 	"time"
 
@@ -132,7 +131,6 @@ func randomizedCubicLine(screen *ebiten.Image,
 	opt.AntiAlias = antialias
 	opt.FillRule = ebiten.NonZero
 	screen.DrawTriangles(vs, is, whiteSubImage, opt)
-	log.Printf("\nslope: %.02f\nx1,y1: %.02f,%.02f\nx2,y2: %.02f,%.02f\nx3,y3: %.02f,%.02f\nx4,y4: %.02f,%.02f\n", slope, x1, y1, x2, y2, x3, y3, x4, y4)
 }
 
 func randomizedStrokeLine(screen *ebiten.Image,
