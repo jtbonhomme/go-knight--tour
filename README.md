@@ -1,12 +1,12 @@
 # go-knight-tour
 
-**WORK IN PROGRESS**
-
 Golang simulation of [knight's tour](https://en.wikipedia.org/wiki/Knight%27s_tour), a sequence of moves of a knight on a chessboard such that the knight visits every square exactly once.
 
 ## Solving Knight Tour Problem
 
 ### First naive implementation
+
+![](res/naive.png)
 
 * *Random move: no strategy for moves*,
 * *Implementation: simple recursive implementation*,
@@ -18,6 +18,8 @@ go run cmd/knight/main.go -s 20 -i naive
 
 ### Backtracking
 
+![](res/backtracking.gif)
+
 * *Random move: no strategy for moves*,
 * **Backtracking: examin each move and go back in history to try another branch if reaches a blocking situation**
 * **Result**: algorithm can't find any solution fast enough
@@ -27,6 +29,8 @@ go run cmd/knight/main.go -s 0 -i backtracking
 ```
 
 ### Optimized
+
+![](res/optimized.png)
 
 * **Consider moving in prority toward the cells with minimal access**,
 * Backtracking: examin each move and go back in history to try another branch if reaches a blocking situation

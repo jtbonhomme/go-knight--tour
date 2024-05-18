@@ -19,4 +19,5 @@
 
 # Go workspace file
 go.work
-screenshot_20240518161416.png
+screenshot*.png
+.DS_Store
