@@ -7,6 +7,9 @@ import (
 
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/vector"
+
+	"github.com/jtbonhomme/go-knight-tour/pkg/handdrawn"
+
 	"github.com/jtbonhomme/go-knight-tour/internal/fonts"
 	"github.com/jtbonhomme/go-knight-tour/internal/knight"
 	"github.com/jtbonhomme/go-knight-tour/internal/text"
@@ -144,7 +147,7 @@ func (g *Game) drawKnightMove(screen *ebiten.Image, l, p knight.Position) {
 	// get current float coordinates of knight
 	xp, yp = getCoordinatesFromPosition(p)
 	// draw line between position
-	vector.StrokeLine(screen,
+	handdrawn.Line(screen,
 		xp, yp, xl, yl,
 		strokeWidth, color.RGBA{0xff, 0xff, 0xff, 0xff}, false)
 }
