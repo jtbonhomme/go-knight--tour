@@ -41,13 +41,14 @@ func (k *Knight) Update(positions []Position, tour int) {
 	k.tour = tour
 }
 
-func (k *Knight) Run() {
+func (k *Knight) Run() chan bool {
 	var result bool
+	c := make(chan bool)
+
 	// pick initial position
 	x := rand.Intn(8)
 	y := rand.Intn(8)
-	//x := 4
-	//y := 6
+
 	k.Positions = append(k.Positions, Position{x, y})
 	k.tour = 1
 
@@ -63,10 +64,13 @@ func (k *Knight) Run() {
 		default:
 			log.Fatalf("%s implementation does not exist", k.implementation)
 		}
+
 		log.Printf("solver result: %v at position %v", result, k.Positions[len(k.Positions)-1])
+		c <- result
 	}()
 
 	log.Printf("knight: run")
+	return c
 }
 
 func (p Position) Distance(q Position) int {

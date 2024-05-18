@@ -10,20 +10,25 @@ import (
 )
 
 const (
-	Started = iota
+	BlinkFrameRate uint64 = 30
+	Started               = iota
 	Running
 	Paused
-	Complete
+	GameWon
+	GameLost
 )
 
 // Game manages all internal game mechanisms.
 type Game struct {
-	ScreenWidth     int
-	ScreenHeight    int
-	BackgroundColor color.Color
-	Knight          *knight.Knight
-	state           int
-	start           time.Time
+	ScreenWidth       int
+	ScreenHeight      int
+	BackgroundColor   color.Color
+	Knight            *knight.Knight
+	state             int
+	start             time.Time
+	runResult         chan bool
+	blinkFrameCounter uint64
+	blink             bool
 }
 
 // New creates a new game object.

@@ -27,6 +27,7 @@ func (g *Game) Draw(screen *ebiten.Image) {
 
 	g.drawFrame(screen)
 	g.drawKnight(screen)
+	g.drawFinish(screen)
 	g.drawDebug(screen)
 }
 
@@ -105,5 +106,26 @@ func (g *Game) drawFrame(screen *ebiten.Image) {
 		vector.StrokeLine(screen,
 			x+step*float32(i), y, x+step*float32(i), y+height,
 			strokeWidth, color.RGBA{0x8b, 0x8d, 0x80, 0xff}, false)
+	}
+}
+
+func (g *Game) drawFinish(screen *ebiten.Image) {
+	if g.state == GameWon && g.blink {
+		text.DrawTextAtPos(
+			screen, fonts.BigFont,
+			55,
+			135,
+			"SOLUTION\nFOUND",
+			color.RGBA{R: 0x0f, G: 0xff, B: 0x0f, A: 0xaf},
+		)
+	}
+	if g.state == GameLost && g.blink {
+		text.DrawTextAtPos(
+			screen, fonts.BigFont,
+			55,
+			135,
+			"NO\nSOLUTION",
+			color.RGBA{R: 0xff, G: 0x0f, B: 0x0f, A: 0xaf},
+		)
 	}
 }
