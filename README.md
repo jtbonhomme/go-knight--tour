@@ -38,8 +38,8 @@ go run cmd/knight/main.go -s 0 -i optimized
 
 ### 2D game engine
 
-Ebiten
+* [Ebiten](https://github.com/hajimehoshi/ebiten/v2)
 
 ### Design
 
-* Handwriten lines over Ebiten: https://shihn.ca/posts/2020/roughjs-algorithms/
+* [Hand drawn lines](https://shihn.ca/posts/2020/roughjs-algorithms/)

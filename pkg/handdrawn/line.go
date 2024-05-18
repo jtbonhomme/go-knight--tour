@@ -3,6 +3,7 @@ package handdrawn
 import (
 	"image"
 	"image/color"
+	"log"
 	"math/rand"
 	"time"
 
@@ -11,7 +12,7 @@ import (
 )
 
 const (
-	Roughness float32 = 1.2
+	Roughness float32 = 1.07
 )
 
 var (
@@ -35,33 +36,80 @@ func Line(screen *ebiten.Image,
 	x1, y1, x2, y2, strokeWidth float32,
 	clr color.Color,
 	antialias bool) {
-	randomizedLine(screen,
+	randomizedCubicLine(screen,
 		x1, y1, x2, y2,
+		strokeWidth, clr, antialias)
+	randomizedCubicLine(screen,
+		x2, y2, x1, y1,
 		strokeWidth, clr, antialias)
 }
 
-func randomizedLine(screen *ebiten.Image,
-	x1, y1, x2, y2, strokeWidth float32,
+func signMult(n float32) float32 {
+	if n <= 0 {
+		return -1
+	}
+	return 1
+}
+
+func randomizedCubicLine(screen *ebiten.Image,
+	x1, y1, x4, y4, strokeWidth float32,
 	clr color.Color,
 	antialias bool) {
-	// randomness for start and end points
-	x1 = randomize(x1)
-	y1 = randomize(y1)
-	x2 = randomize(x2)
-	y2 = randomize(y2)
 
 	// bezier
 	var path vector.Path
 
 	// curve origin
-	path.MoveTo(x1, y1)
+	path.MoveTo(randomize(x1), randomize(y1))
 
-	// add next point with vectors
-	cpx0, cpy0 := x1, y1
-	cpx1, cpy1 := x2, y2
-	cpx0 += 30
-	cpx1 -= 30
-	path.CubicTo(cpx0, cpy0, cpx1, cpy1, x2, y2)
+	// Line analysis
+	slope := (y4 - y1) / (x4 - x1)
+
+	// 1st segment; add next point with vectors
+	x2 := x1 + (x4-x1)/2
+	y2 := y1 + (y4-y1)/2
+	cpx1, cpy1 := x1, y1
+	cpx2, cpy2 := x2, y2
+	if slope <= 0 {
+		cpx1 += signMult((x4 - x1)) * Roughness
+		cpy2 += signMult((x4 - x1)) * Roughness
+
+	} else {
+		cpx1 += signMult((x4 - x1)) * Roughness
+		cpy2 += -signMult((x4 - x1)) * Roughness
+	}
+	// randomness for start and end points
+	path.CubicTo(randomize(cpx1), randomize(cpy1), randomize(cpx2), randomize(cpy2), randomize(x2), randomize(y2))
+
+	// 2nd segment; add next point with vectors
+	x3 := x1 + 3*(x4-x1)/4
+	y3 := y1 + 3*(y4-y1)/4
+	cpx2, cpy2 = x2, y2
+	cpx3, cpy3 := x3, y3
+	if slope <= 0 {
+		cpy2 += -signMult((x4 - x1)) * Roughness
+		cpx3 += -signMult((x4 - x1)) * Roughness
+
+	} else {
+		cpy2 += signMult((x4 - x1)) * Roughness
+		cpx3 += -signMult((x4 - x1)) * Roughness
+	}
+	// randomness for start and end points
+	path.CubicTo(randomize(cpx2), randomize(cpy2), randomize(cpx3), randomize(cpy3), randomize(x3), randomize(y3))
+
+	// 3rd segment; add next point with vectors
+	cpx3, cpy3 = x3, y3
+	cpx4, cpy4 := x4, y4
+	if slope <= 0 {
+		cpy3 += signMult((x4 - x1)) * Roughness
+		cpx4 += signMult((x4 - x1)) * Roughness
+
+	} else {
+		cpy3 += -signMult((x4 - x1)) * Roughness
+		cpx4 += signMult((x4 - x1)) * Roughness
+	}
+	// randomness for start and end points
+	path.CubicTo(randomize(cpx3), randomize(cpy3), randomize(cpx4), randomize(cpy4), randomize(x4), randomize(y4))
 
 	var vs []ebiten.Vertex
 	var is []uint16
@@ -84,19 +132,16 @@ func randomizedLine(screen *ebiten.Image,
 	opt.AntiAlias = antialias
 	opt.FillRule = ebiten.NonZero
 	screen.DrawTriangles(vs, is, whiteSubImage, opt)
+	log.Printf("\nslope: %.02f\nx1,y1: %.02f,%.02f\nx2,y2: %.02f,%.02f\nx3,y3: %.02f,%.02f\nx4,y4: %.02f,%.02f\n", slope, x1, y1, x2, y2, x3, y3, x4, y4)
 }
 
 func randomizedStrokeLine(screen *ebiten.Image,
 	x1, y1, x2, y2, strokeWidth float32,
 	clr color.Color,
 	antialias bool) {
-	// randomness for start and end points
-	x1 = randomize(x1)
-	y1 = randomize(y1)
-	x2 = randomize(x2)
-	y2 = randomize(y2)
 
+	// randomness for start and end points
 	vector.StrokeLine(screen,
-		x1, y1, x2, y2,
+		randomize(x1), randomize(y1), randomize(x2), randomize(y2),
 		strokeWidth, clr, antialias)
 }

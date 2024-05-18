@@ -148,7 +148,7 @@ func (g *Game) drawKnightMove(screen *ebiten.Image, l, p knight.Position) {
 	xp, yp = getCoordinatesFromPosition(p)
 	// draw line between position
 	handdrawn.Line(screen,
-		xp, yp, xl, yl,
+		xl, yl, xp, yp,
 		strokeWidth, color.RGBA{0xff, 0xff, 0xff, 0xff}, false)
 }
 
