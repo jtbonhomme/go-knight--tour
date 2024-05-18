@@ -10,12 +10,13 @@ import (
 
 func (k *Knight) handleSpeed() {
 	select {
-	case s := <-k.speedChange:
-		log.Println("speed change")
-		k.speed = s
+	case s := <-k.slowMotionChange:
+		log.Println("slowMotion change")
+		k.slowMotion = s
 	default:
 	}
-	time.Sleep(time.Millisecond * time.Duration(float64(1000*k.speed)/ebiten.ActualTPS()))
+
+	time.Sleep(time.Millisecond * time.Duration(float64(1000*k.slowMotion)/ebiten.ActualTPS()))
 }
 
 func (k *Knight) NaiveSolver(tour int, positions []Position, stopChannel chan struct{}) bool {

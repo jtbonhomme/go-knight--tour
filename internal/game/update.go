@@ -26,24 +26,24 @@ func (g *Game) Update() error {
 	}
 
 	if inpututil.IsKeyJustPressed(ebiten.KeyArrowUp) {
-		g.speed++
-		g.speedChange <- g.speed
+		g.slowMotion++
+		g.slowMotionChange <- g.slowMotion
 	}
 
 	if inpututil.IsKeyJustPressed(ebiten.KeyArrowDown) {
-		s := g.speed - 1
-		if s < 0 {
-			g.speed = 0
-			g.speedChange <- g.speed
+		s := g.slowMotion - 1
+		if s < 1 {
+			g.slowMotion = 1
+			g.slowMotionChange <- g.slowMotion
 		} else {
-			g.speed = s
-			g.speedChange <- g.speed
+			g.slowMotion = s
+			g.slowMotionChange <- g.slowMotion
 		}
 	}
 
 	if g.state == Running {
-		g.ticks += 1 + uint64(g.speed)
-		g.duration = time.Millisecond * time.Duration(1000/ebiten.ActualTPS()) / time.Duration(g.ticks)
+		g.duration += time.Since(g.lastTime) / time.Duration(g.slowMotion)
+		g.lastTime = time.Now()
 		select {
 		case result := <-g.runResult:
 			log.Println("received message from knight solver", result)

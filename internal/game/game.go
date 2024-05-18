@@ -31,23 +31,24 @@ type Game struct {
 	blinkFrameCounter uint64
 	blink             bool
 	stopChannel       chan struct{}
-	speed             int
+	slowMotion        int
 	implementation    string
-	speedChange       chan int
-	ticks             uint64
-	rtTicks           uint64
+	slowMotionChange  chan int
+	lastTime          time.Time
+	debug             bool
 }
 
 // New creates a new game object.
-func New(speed int, implementation string) *Game {
+func New(slowMotion int, implementation string, debug bool) *Game {
 	g := &Game{
-		ScreenWidth:     500,
-		ScreenHeight:    500,
-		BackgroundColor: color.RGBA{0x0b, 0x0d, 0x00, 0xff},
-		speed:           speed,
-		implementation:  implementation,
-		state:           Started,
-		speedChange:     make(chan int),
+		ScreenWidth:      500,
+		ScreenHeight:     500,
+		BackgroundColor:  color.RGBA{0x0b, 0x0d, 0x00, 0xff},
+		slowMotion:       slowMotion,
+		implementation:   implementation,
+		state:            Started,
+		slowMotionChange: make(chan int),
+		debug:            debug,
 	}
 
 	return g
@@ -70,10 +71,10 @@ func (g *Game) Restart() {
 	}
 	g.stopChannel = make(chan struct{})
 	g.state = Running
-	g.ticks = 0
-	g.rtTicks = 0
+	g.duration = 0
 	g.start = time.Now()
-	g.Knight = knight.New(g.speed, g.implementation, g.speedChange)
+	g.lastTime = time.Now()
+	g.Knight = knight.New(g.slowMotion, g.implementation, g.slowMotionChange)
 	g.runResult = g.Knight.Run(g.stopChannel)
 	log.Printf("game: run")
 }

@@ -9,14 +9,19 @@ import (
 
 func main() {
 	var err error
-	var speed int
+	var slowMotion int
 	var implementation string
+	var debug bool
 
 	flag.StringVar(&implementation, "i", "naive", "implementation (default is \"naive\")")
-	flag.IntVar(&speed, "s", 0, "speed resolution (default is 0)")
+	flag.IntVar(&slowMotion, "s", 1, "slowMotion resolution (default is 1)")
+	flag.BoolVar(&debug, "d", false, "debug (default is false)")
 	flag.Parse()
 
-	g := game.New(speed, implementation)
+	if slowMotion < 1 {
+		slowMotion = 1
+	}
+	g := game.New(slowMotion, implementation, debug)
 
 	log.Println("Start game")
 	err = g.Run()

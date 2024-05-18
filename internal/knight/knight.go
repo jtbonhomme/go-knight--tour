@@ -17,20 +17,20 @@ var accessibility = [8 * 8]int{
 
 type Knight struct {
 	Positions      []Position
-	speed          int
+	slowMotion          int
 	tour           int
 	implementation string
 	grid           [8 * 8]int
-	speedChange    chan int
+	slowMotionChange    chan int
 }
 
-func New(speed int, implementation string, speedChange chan int) *Knight {
+func New(slowMotion int, implementation string, slowMotionChange chan int) *Knight {
 	return &Knight{
 		Positions:      []Position{},
-		speed:          speed,
+		slowMotion:          slowMotion,
 		implementation: implementation,
 		grid:           accessibility,
-		speedChange:    speedChange,
+		slowMotionChange:    slowMotionChange,
 	}
 }
 

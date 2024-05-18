@@ -3,6 +3,7 @@ package game
 import (
 	"fmt"
 	"image/color"
+	"time"
 
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/vector"
@@ -32,20 +33,15 @@ func (g *Game) Draw(screen *ebiten.Image) {
 }
 
 func (g *Game) drawDebug(screen *ebiten.Image) {
+	if !g.debug {
+		return
+	}
 
 	text.DrawTextAtPos(
 		screen, fonts.SmallFont,
 		50,
 		25,
 		fmt.Sprintf("Engine TPS: %.02f", ebiten.ActualTPS()),
-		color.RGBA{R: 0x00, G: 0xff, B: 0xff, A: 0xff},
-	)
-
-	text.DrawTextAtPos(
-		screen, fonts.SmallFont,
-		250,
-		25,
-		fmt.Sprintf("Game ticks: %d", g.ticks),
 		color.RGBA{R: 0x00, G: 0xff, B: 0xff, A: 0xff},
 	)
 }
@@ -72,7 +68,7 @@ func (g *Game) drawInfo(screen *ebiten.Image) {
 
 	text.DrawTextAtPos(
 		screen, fonts.SmallFont,
-		310,
+		313,
 		470,
 		"solver: "+g.implementation,
 		color.RGBA{R: 0x00, G: 0xff, B: 0xff, A: 0xff},
@@ -85,18 +81,20 @@ func (g *Game) drawInfo(screen *ebiten.Image) {
 		fmt.Sprintf("tour: %02d", g.Knight.Tour()),
 		color.RGBA{R: 0x00, G: 0xff, B: 0xff, A: 0xff},
 	)
+
 	text.DrawTextAtPos(
 		screen, fonts.SmallFont,
-		155,
+		115,
 		490,
-		fmt.Sprintf("duration: %s", g.duration),
+		fmt.Sprintf("duration: %s", g.duration.Truncate(time.Millisecond)),
 		color.RGBA{R: 0x00, G: 0xff, B: 0xff, A: 0xff},
 	)
+
 	text.DrawTextAtPos(
 		screen, fonts.SmallFont,
-		370,
+		330,
 		490,
-		fmt.Sprintf("speed: %03d", g.speed),
+		fmt.Sprintf("slow motion: %03d", g.slowMotion),
 		color.RGBA{R: 0x00, G: 0xff, B: 0xff, A: 0xff},
 	)
 }
