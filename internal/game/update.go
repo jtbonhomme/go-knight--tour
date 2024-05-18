@@ -22,16 +22,11 @@ func (g *Game) Update() error {
 	}
 
 	if inpututil.IsKeyJustPressed(ebiten.KeySpace) {
-		switch g.state {
-		case Started:
-			g.state = Running
-			g.start = time.Now()
-			g.runResult = g.Knight.Run()
-			log.Printf("game: run")
-		}
+		g.Restart()
 	}
 
 	if g.state == Running {
+		g.duration = time.Since(g.start)
 		select {
 		case result := <-g.runResult:
 			log.Println("received message from knight solver", result)

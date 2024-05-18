@@ -41,7 +41,7 @@ func (k *Knight) Update(positions []Position, tour int) {
 	k.tour = tour
 }
 
-func (k *Knight) Run() chan bool {
+func (k *Knight) Run(stopChannel chan struct{}) chan bool {
 	var result bool
 	c := make(chan bool)
 
@@ -56,11 +56,11 @@ func (k *Knight) Run() chan bool {
 		log.Println("start knight's tour solver: starting from ", Position{x, y})
 		switch k.implementation {
 		case "naive":
-			result = k.NaiveSolver(k.tour, k.Positions)
+			result = k.NaiveSolver(k.tour, k.Positions, stopChannel)
 		case "backtracking":
-			result = k.BacktrackingSolver(k.tour, k.Positions)
+			result = k.BacktrackingSolver(k.tour, k.Positions, stopChannel)
 		case "optimized":
-			result = k.OptimizedSolver(k.tour, k.Positions)
+			result = k.OptimizedSolver(k.tour, k.Positions, stopChannel)
 		default:
 			log.Fatalf("%s implementation does not exist", k.implementation)
 		}

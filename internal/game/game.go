@@ -2,6 +2,7 @@ package game
 
 import (
 	"image/color"
+	"log"
 	"time"
 
 	"github.com/jtbonhomme/go-knight-tour/internal/knight"
@@ -13,7 +14,6 @@ const (
 	BlinkFrameRate uint64 = 30
 	Started               = iota
 	Running
-	Paused
 	GameWon
 	GameLost
 )
@@ -26,9 +26,13 @@ type Game struct {
 	Knight            *knight.Knight
 	state             int
 	start             time.Time
+	duration          time.Duration
 	runResult         chan bool
 	blinkFrameCounter uint64
 	blink             bool
+	stopChannel       chan struct{}
+	speed             int
+	implementation    string
 }
 
 // New creates a new game object.
@@ -37,7 +41,8 @@ func New(speed int, implementation string) *Game {
 		ScreenWidth:     500,
 		ScreenHeight:    500,
 		BackgroundColor: color.RGBA{0x0b, 0x0d, 0x00, 0xff},
-		Knight:          knight.New(speed, implementation),
+		speed:           speed,
+		implementation:  implementation,
 		state:           Started,
 	}
 
@@ -52,6 +57,19 @@ func (g *Game) Run() error {
 	ebiten.SetWindowResizingMode(ebiten.WindowResizingModeEnabled)
 
 	return ebiten.RunGame(g)
+}
+
+func (g *Game) Restart() {
+	if g.state == Running {
+		log.Println("restart game")
+		close(g.stopChannel)
+	}
+	g.stopChannel = make(chan struct{})
+	g.state = Running
+	g.start = time.Now()
+	g.Knight = knight.New(g.speed, g.implementation)
+	g.runResult = g.Knight.Run(g.stopChannel)
+	log.Printf("game: run")
 }
 
 // Layout takes the outside size (e.g., the window size) and returns the (logical) screen size.

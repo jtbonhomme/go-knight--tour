@@ -3,7 +3,6 @@ package game
 import (
 	"fmt"
 	"image/color"
-	"time"
 
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/vector"
@@ -32,20 +31,39 @@ func (g *Game) Draw(screen *ebiten.Image) {
 }
 
 func (g *Game) drawDebug(screen *ebiten.Image) {
-	if g.state != Running {
+	if g.state == Started {
+		text.DrawTextAtPos(
+			screen, fonts.SmallFont,
+			50,
+			470,
+			"Press SPACE to start solving knight tour problem",
+			color.RGBA{R: 0x00, G: 0xff, B: 0xff, A: 0xff},
+		)
 		return
 	}
 
 	text.DrawTextAtPos(
 		screen, fonts.SmallFont,
 		50,
-		480,
-		fmt.Sprintf("tour: %02d     time: %d", g.Knight.Tour(), int(time.Since(g.start).Milliseconds()/1000)),
+		470,
+		"Press SPACE to restart",
+		color.RGBA{R: 0x00, G: 0xff, B: 0xff, A: 0xff},
+	)
+
+	text.DrawTextAtPos(
+		screen, fonts.SmallFont,
+		50,
+		490,
+		fmt.Sprintf("tour: %02d     time: %s", g.Knight.Tour(), g.duration),
 		color.RGBA{R: 0x00, G: 0xff, B: 0xff, A: 0xff},
 	)
 }
 
 func (g *Game) drawKnight(screen *ebiten.Image) {
+	if g.state == Started {
+		return
+	}
+
 	lastPosition := knight.Position{X: -1, Y: -1}
 
 	for _, p := range g.Knight.Positions {
