@@ -32,7 +32,7 @@ go run cmd/knight/main.go -s 0 -i backtracking
 
 ![](res/optimized.png)
 
-* **Consider moving in prority toward the cells with minimal access**,
+* **Consider moving in prority toward cells with minimal access**,
 * Backtracking: examin each move and go back in history to try another branch if reaches a blocking situation
 * **Result**: super fast solution found
 
