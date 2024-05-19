@@ -55,6 +55,8 @@ go run cmd/knight/main.go -s 0 -i backtracking
 
 ![](res/optimized.png)
 
+This algorithm implements the [Warnsdorf's rule](https://en.wikipedia.org/wiki/Knight%27s_tour#Warnsdorf's_rule).
+
 * **Consider moving in prority toward cells with minimal access**,
 * Backtracking: examin each move and go back in history to try another branch if reaches a blocking situation
 * **Result**: super fast solution found
@@ -70,3 +72,11 @@ go run cmd/knight/main.go -s 0 -i optimized
 ### Design
 
 * [Hand drawn lines](https://shihn.ca/posts/2020/roughjs-algorithms/)
+
+## Todo
+
+* [ ] Export handdrawn line as a separate library (remove init, make a struct)
+* [ ] Try to solve noise and agitation due to randomness recomputed every tick
+* [ ] Offer an option to chose line design
+* [ ] Detect Hamiltonian closed graphs
+* [ ] Fill a cell over two with a color (like a chess board)
